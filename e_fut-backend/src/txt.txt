@@ -1,0 +1,73 @@
+# Download and install fnm:
+winget install Schniz.fnm
+
+# Download and install Node.js:
+fnm install 23
+
+# Verify the Node.js version:
+node -v # Should print "v23.6.1".
+
+# Verify npm version:
+npm -v # Should print "10.9.2".
+
+Seu App.js é um aplicativo React Native com navegação baseada em react-navigation. Para executá-lo, siga os passos abaixo:
+
+✅ 1. Instale as Dependências
+Caso ainda não tenha instalado as bibliotecas necessárias, abra o terminal na pasta do projeto e execute:
+sh
+
+npm install
+Se ainda não tiver react-navigation, instale com:
+sh
+
+npm install @react-navigation/native
+npm install react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated react-native-vector-icons @react-navigation/stack
+⚠️ Se estiver usando Expo, instale a versão específica para Expo:
+sh
+
+expo install react-native-gesture-handler react-native-reanimated react-native-screens react-native-safe-area-context @react-navigation/native @react-navigation/stack
+
+✅ 2. Execute o App
+Agora, execute o aplicativo no emulador ou no celular:
+🔹 Se estiver usando Expo:
+sh
+
+npx expo start
+Ou apenas:
+sh
+
+expo start
+Isso abrirá o Expo Developer Tools no navegador. Você pode escanear o QR Code com o aplicativo Expo Go ou rodar em um emulador.
+🔹 Se estiver usando React Native CLI (Android e iOS):
+Para Android (emulador ou dispositivo conectado):
+sh
+
+npx react-native run-android
+Para iOS (no macOS, com Xcode configurado):
+sh
+
+npx react-native run-ios
+
+🔥 Possíveis Erros e Soluções
+1️⃣ Erro: React Native Gesture Handler não está funcionando?
+Adicione esta linha no topo do index.js (ou index.tsx):
+js
+
+import 'react-native-gesture-handler';
+2️⃣ Erro com react-native-reanimated?
+Certifique-se de que está importando corretamente e, se necessário, reinicie o Metro bundler:
+sh
+
+npx react-native start --reset-cache
+3️⃣ Erro no Android: "Cannot load script" ou "Failed to load bundle"
+Tente rodar:
+sh
+
+npx react-native start --reset-cache
+npx react-native run-android
+
+Se precisar de mais ajuda, me avise! 🚀
+
+
+
+
