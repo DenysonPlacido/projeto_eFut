@@ -153,14 +153,14 @@ const GamesScreen = () => {
               <TouchableOpacity style={styles.actionButton} onPress={handleAddPlayer}>
                 <Text style={styles.buttonText}>Adicionar Jogador</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={handleFetchHistory}>
-                <Text style={styles.buttonText}>Consultar Histórico</Text>
+              <TouchableOpacity style={styles.actionButton} onPress={handleRemovePlayer}>
+              <Text style={styles.buttonText}>Remover Jogador</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.actionButton} onPress={handleGenerateTeams}>
                 <Text style={styles.buttonText}>Gerar Times</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={handleRemovePlayer}>
-                <Text style={styles.buttonText}>Remover Jogador</Text>
+              <TouchableOpacity style={styles.actionButton} onPress={handleFetchHistory}>
+                <Text style={styles.buttonText}>Consultar Histórico</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.actionButton} onPress={() => setGameFetched(false)}>
                 <Text style={styles.buttonText}>Voltar</Text>
@@ -237,12 +237,16 @@ const GamesScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
+background: {
+    flex: 1, 
+    width: '100%', 
+    height: '100%', 
     resizeMode: 'cover',
+    opacite: 5
   },
   container: {
-    flexGrow: 1,
+    flex: 1, 
+    justifyContent: 'center', 
     padding: 20,
   },
   title: {

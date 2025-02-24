@@ -19,7 +19,7 @@ const removePlayer = async (req, res) => {
   const request = new sql.Request();
 
   try {
-    // Verificar se o usuário logado é administrador
+    
     const adminCheckResult = await request.query(`SELECT user_adm FROM jogadores WHERE WHATS = '${usuarioLogado}'`);
     const isAdmin = adminCheckResult.recordset[0]?.user_adm === 1;
 
@@ -69,18 +69,17 @@ const generateTeams = (req, res) => {
 const gameList = (req, res) => {
   const { idJogo } = req.query;
   const request = new sql.Request();
-  
-  console.log('Recebendo solicitação para gameList com idJogo:', idJogo); // Log de entrada
+ 
   
   request.input('IDJOGO', sql.Int, idJogo)
     .execute('dbo.CONSULTA_LISTA_JOGO', (err, result) => {
       if (err) {
-        console.error('Erro ao executar CONSULTA_LISTA_JOGO:', err); // Log do erro
+   
         res.status(500).send(err);
       } else {
-        console.log('Resultado da procedure CONSULTA_LISTA_JOGO:', result); // Log do resultado
+
         
-        // Garantir que estamos lidando com múltiplos recordsets
+
         if (result.recordsets && result.recordsets.length >= 3) {
           const response = {
             goalkeepers: result.recordsets[0],
@@ -89,7 +88,7 @@ const gameList = (req, res) => {
           };
           res.status(200).send(response);
         } else {
-          console.error('Dados incompletos retornados pela procedure.'); // Log de dados incompletos
+ 
           res.status(500).send({ message: 'Dados incompletos retornados pela procedure.' });
         }
       }

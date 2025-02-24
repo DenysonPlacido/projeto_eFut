@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -28,14 +27,6 @@ const AppNavigator = () => {
     const checkAuthStatus = async () => {
       const token = await AsyncStorage.getItem('authToken');
       setIsLoggedIn(!!token);
-
-      if (token) {
-        setTimeout(() => {
-          Alert.alert('Sessão Expirada', 'Por favor, faça login novamente.');
-          AsyncStorage.removeItem('authToken');
-          setIsLoggedIn(false);
-        }, 1200000); // 2 minutos
-      }
     };
 
     checkAuthStatus();
@@ -46,19 +37,23 @@ const AppNavigator = () => {
       {isLoggedIn ? (
         <Drawer.Navigator>
           <Drawer.Screen name="Home" component={HomeScreen} />
-          <Drawer.Screen name="User" component={UserScreen} />
-          <Drawer.Screen name="Games" component={GamesScreen} />
-          <Drawer.Screen name="Finance" component={FinanceScreen} />
-          <Drawer.Screen name="Meetings" component={MeetingsScreen} />
-          <Drawer.Screen name="Incentives" component={IncentivesScreen} />
-          <Drawer.Screen name="Teams" component={TeamsScreen} />
-          <Drawer.Screen name="Settings" component={SettingsScreen} />
-          <Drawer.Screen name="Locations" component={LocationsScreen} />
-          <Drawer.Screen name="Logout" component={LogoutScreen} />
+          <Drawer.Screen name="Usuário" component={UserScreen} />
+          <Drawer.Screen name="Jogos" component={GamesScreen} />
+          <Drawer.Screen name="Financeiro" component={FinanceScreen} />
+          <Drawer.Screen name="Encontros" component={MeetingsScreen} />
+          <Drawer.Screen name="Incentivos" component={IncentivesScreen} />
+          <Drawer.Screen name="Formador de Times" component={TeamsScreen} />
+          <Drawer.Screen name="Configurações" component={SettingsScreen} />
+          <Drawer.Screen name="Localizações" component={LocationsScreen} />
+          <Drawer.Screen name="Sair">
+            {(props) => <LogoutScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+          </Drawer.Screen>
         </Drawer.Navigator>
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Login">
+            {(props) => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+          </Stack.Screen>
           <Stack.Screen name="Register" component={RegisterScreen} />
         </Stack.Navigator>
       )}

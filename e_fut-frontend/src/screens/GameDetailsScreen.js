@@ -5,8 +5,7 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 
 const GameDetailsScreen = ({ route, navigation }) => {
   const { gameId } = route.params;
-  
-  // Dados fictícios para o jogo, você pode substituir pela chamada real ao banco de dados
+
   const games = [
     { id: '1', date: '2024-11-10', time: '18:00', location: 'Arena Futebol Society' },
     { id: '2', date: '2024-11-11', time: '19:30', location: 'Estádio Campo Grande' },
