@@ -4,13 +4,16 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+
 const LoginScreen = ({ navigation, setIsLoggedIn }) => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/api/users/login', { phone, password });
+      // const response = await axios.post('http://localhost:3000/api/users/login', { phone, password });
+      const response = await axios.post('http://192.168.1.117:3000/api/users/login', { phone, password });
+
       const { token } = response.data;
       await AsyncStorage.setItem('authToken', token);
       await AsyncStorage.setItem('loggedInUserWhats', phone);
@@ -32,48 +35,48 @@ const LoginScreen = ({ navigation, setIsLoggedIn }) => {
 
   return (
     <ImageBackground source={require('../../assets/images/fundo_login.png')} style={styles.background}>
-      <View style={styles.container}>
-        <Text style={styles.title}>eFut</Text>
+      <View style={styles.overlay}>
+        <View style={styles.container}>
+          <Text style={styles.title}>eFut</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Número de WhatsApp"
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Número de WhatsApp"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
 
- 
-        <TouchableOpacity onPress={handleForgotPassword}>
-          <Text style={styles.forgotPassword}>Esqueci minha senha</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={handleForgotPassword}>
+            <Text style={styles.forgotPassword}>Esqueci minha senha</Text>
+          </TouchableOpacity>
 
-      
-        <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.registerText}>Criar uma conta</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.registerText}>Criar uma conta</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Desenvolvido por Denyson Plácido</Text>
-        <TouchableOpacity onPress={() => Linking.openURL('https://github.com/denysonplacido')}>
-          <Icon name="logo-github" size={30} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleContactDeveloper}>
-          <Icon name="logo-whatsapp" size={30} color="#25D366" />
-        </TouchableOpacity>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Desenvolvido por Denyson Plácido</Text>
+          <TouchableOpacity onPress={() => Linking.openURL('https://github.com/denysonplacido')}>
+            <Icon name="logo-github" size={30} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleContactDeveloper}>
+            <Icon name="logo-whatsapp" size={30} color="#25D366" />
+          </TouchableOpacity>
+        </View>
       </View>
     </ImageBackground>
   );
@@ -86,9 +89,12 @@ const styles = StyleSheet.create({
     height: '100%', 
     resizeMode: 'cover', 
   },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Efeito escuro no overlay
+    justifyContent: 'center',
+  },
   container: {
-    flex: 1, 
-    justifyContent: 'center', 
     padding: 20,
   },
   title: { fontSize: 28, marginBottom: 20, textAlign: 'center', color: '#fff' },
@@ -103,4 +109,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-

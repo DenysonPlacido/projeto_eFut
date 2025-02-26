@@ -32,7 +32,18 @@ const authenticateUser = async (userData) => {
   return null;
 };
 
+// Função para atualizar os dados do usuário
+const updateUser = async (name, nickname, phone, password, whats) => {
+  const request = new sql.Request();
+  
+  return request.query(`
+    exec dbo.update_user @NOME='${name}', @APELIDO='${nickname}', @WHATS='${phone}', @SENHA='${password}', @WHATS_USER='${whats}'
+  `);
+};
+
+
 module.exports = {
   createUser,
+  updateUser,
   authenticateUser
 };

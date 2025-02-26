@@ -19,7 +19,6 @@ const removePlayer = async (req, res) => {
   const request = new sql.Request();
 
   try {
-    
     const adminCheckResult = await request.query(`SELECT user_adm FROM jogadores WHERE WHATS = '${usuarioLogado}'`);
     const isAdmin = adminCheckResult.recordset[0]?.user_adm === 1;
 
@@ -69,17 +68,11 @@ const generateTeams = (req, res) => {
 const gameList = (req, res) => {
   const { idJogo } = req.query;
   const request = new sql.Request();
- 
-  
   request.input('IDJOGO', sql.Int, idJogo)
     .execute('dbo.CONSULTA_LISTA_JOGO', (err, result) => {
       if (err) {
-   
         res.status(500).send(err);
       } else {
-
-        
-
         if (result.recordsets && result.recordsets.length >= 3) {
           const response = {
             goalkeepers: result.recordsets[0],
@@ -88,7 +81,6 @@ const gameList = (req, res) => {
           };
           res.status(200).send(response);
         } else {
- 
           res.status(500).send({ message: 'Dados incompletos retornados pela procedure.' });
         }
       }

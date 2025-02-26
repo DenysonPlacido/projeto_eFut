@@ -13,11 +13,12 @@ const GamesScreen = () => {
   const [substitutes, setSubstitutes] = useState([]);
   const [gameFetched, setGameFetched] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState({});
 
   useEffect(() => {
     const checkAdminStatus = async () => {
       const loggedInUserWhats = await AsyncStorage.getItem('loggedInUserWhats');
-      axios.get(`http://localhost:3000/api/users/checkAdmin`, { params: { phone: loggedInUserWhats } })
+      axios.get(`http://192.168.1.117:3000/api/users/checkAdmin`, { params: { phone: loggedInUserWhats } })
         .then(response => {
           setIsAdmin(response.data.isAdmin);
         })
@@ -26,7 +27,19 @@ const GamesScreen = () => {
         });
     };
 
+    const fetchLoggedInUser = async () => {
+      const loggedInUserWhats = await AsyncStorage.getItem('loggedInUserWhats');
+      axios.get(`http://192.168.1.117:3000/api/users/getUser`, { params: { phone: loggedInUserWhats } })
+        .then(response => {
+          setLoggedInUser(response.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    };
+
     checkAdminStatus();
+    fetchLoggedInUser();
   }, []);
 
   const getLoggedInUser = async () => {
@@ -40,7 +53,7 @@ const GamesScreen = () => {
   };
 
   const handleAddPlayer = () => {
-    axios.post(`http://localhost:3000/api/games/addPlayer`, { 
+    axios.post(`http://192.168.1.117:3000/api/games/addPlayer`, { 
       whats: userId, 
       goleiroOuLinha: playerType, 
       idJogo: gameId
@@ -57,7 +70,7 @@ const GamesScreen = () => {
 
   const handleRemovePlayer = async () => {
     const loggedInUser = await getLoggedInUser();
-    axios.post(`http://localhost:3000/api/games/removePlayer`, { 
+    axios.post(`http://192.168.1.117:3000/api/games/removePlayer`, { 
       whats: userId, 
       idJogo: gameId, 
       usuarioLogado: loggedInUser
@@ -73,7 +86,7 @@ const GamesScreen = () => {
   };
 
   const fetchGameList = () => {
-    axios.get(`http://localhost:3000/api/games/gameList`, { params: { idJogo: gameId } })
+    axios.get(`http://192.168.1.117:3000/api/games/gameList`, { params: { idJogo: gameId } })
       .then(response => {
         const { goalkeepers, fieldPlayers, substitutes } = response.data;
         setGoalkeepers(goalkeepers);
@@ -88,7 +101,7 @@ const GamesScreen = () => {
   };
 
   const handleFetchHistory = () => {
-    axios.get(`http://localhost:3000/api/games/fetchGameHistory`, { params: { idJogo: gameId } })
+    axios.get(`http://192.168.1.117:3000/api/games/fetchGameHistory`, { params: { idJogo: gameId } })
       .then(response => {
         console.log(response.data);
       })
@@ -99,7 +112,7 @@ const GamesScreen = () => {
   };
 
   const handleGenerateTeams = () => {
-    axios.post(`http://localhost:3000/api/games/generateTeams`, { 
+    axios.post(`http://192.168.1.117:3000/api/games/generateTeams`, { 
       goleiroEntra: 1, 
       cores: 'Amarelo;Preto;Verde', 
       idJogo: gameId 
@@ -116,137 +129,154 @@ const GamesScreen = () => {
 
   return (
     <ImageBackground source={require('../../assets/images/fundo-esportivo.jpg')} style={styles.background}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {!gameFetched ? (
-          <>
-            <Text style={styles.title}>Digite o ID do Jogo</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="ID do Jogo" 
-              value={gameId} 
-              onChangeText={setGameId} 
-            />
-            <TouchableOpacity style={styles.button} onPress={fetchGameList}>
-              <Text style={styles.buttonText}>Buscar Jogo</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <Text style={styles.title}>Gerenciamento de Jogos</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="WhatsApp do Usuário" 
-              value={userId} 
-              onChangeText={setUserId} 
-            />
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={playerType}
-                style={styles.picker}
-                onValueChange={(itemValue) => setPlayerType(itemValue)}
-              >
-                <Picker.Item label="Linha" value="Linha" />
-                <Picker.Item label="Goleiro" value="Goleiro" />
-              </Picker>
-            </View>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.actionButton} onPress={handleAddPlayer}>
-                <Text style={styles.buttonText}>Adicionar Jogador</Text>
+      <View style={styles.overlay}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>{loggedInUser.nickname || loggedInUser.name} ({loggedInUser.phone})</Text>
+        </View>
+        <ScrollView contentContainerStyle={styles.container}>
+          {!gameFetched ? (
+            <>
+              <Text style={styles.title}>Digite o ID do Jogo</Text>
+              <TextInput 
+                style={styles.input} 
+                placeholder="ID do Jogo" 
+                value={gameId} 
+                onChangeText={setGameId} 
+              />
+              <TouchableOpacity style={styles.button} onPress={fetchGameList}>
+                <Text style={styles.buttonText}>Buscar Jogo</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={handleRemovePlayer}>
-              <Text style={styles.buttonText}>Remover Jogador</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={handleGenerateTeams}>
-                <Text style={styles.buttonText}>Gerar Times</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={handleFetchHistory}>
-                <Text style={styles.buttonText}>Consultar Histórico</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={() => setGameFetched(false)}>
-                <Text style={styles.buttonText}>Voltar</Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.subTitle}>Goleiros</Text>
-            <View style={styles.table}>
-              <View style={styles.tableHeader}>
-                <Text style={styles.tableHeaderText}>Vaga</Text>
-                <Text style={styles.tableHeaderText}>Nome</Text>
-                <Text style={styles.tableHeaderText}>Data e Hora</Text>
-                <Text style={styles.tableHeaderText}>Time</Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.title}>Gerenciamento de Jogos</Text>
+              <TextInput 
+                style={styles.input} 
+                placeholder="WhatsApp do Usuário" 
+                value={userId} 
+                onChangeText={setUserId} 
+              />
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={playerType}
+                  style={styles.picker}
+                  onValueChange={(itemValue) => setPlayerType(itemValue)}
+                >
+                  <Picker.Item label="Linha" value="Linha" />
+                  <Picker.Item label="Goleiro" value="Goleiro" />
+                </Picker>
               </View>
-              {goalkeepers.map((item, index) => (
-                <View style={styles.tableRow} key={`${item.Vaga}-${index}`}>
-                  <Text style={styles.tableCell}>{item.Vaga}</Text>
-                  <Text style={styles.tableCell}>{item.Goleiros}</Text>
-                  <Text style={styles.tableCell}>
-                    {new Date(item['Data e Hora da Endrada']).toLocaleDateString('pt-BR')}{"\n"}
-                    {new Date(item['Data e Hora da Endrada']).toLocaleTimeString('pt-BR')}
-                  </Text>
-                  <Text style={styles.tableCell}>{item.Time}</Text>
-                </View>
-              ))}
-            </View>
-
-            <Text style={styles.subTitle}>Jogadores de Linha</Text>
-            <View style={styles.table}>
-              <View style={styles.tableHeader}>
-                <Text style={styles.tableHeaderText}>Vaga</Text>
-                <Text style={styles.tableHeaderText}>Nome</Text>
-                <Text style={styles.tableHeaderText}>Data e Hora</Text>
-                <Text style={styles.tableHeaderText}>Time</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.actionButton} onPress={handleAddPlayer}>
+                  <Text style={styles.buttonText}>Adicionar Jogador</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={handleRemovePlayer}>
+                  <Text style={styles.buttonText}>Remover Jogador</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={handleGenerateTeams}>
+                  <Text style={styles.buttonText}>Gerar Times</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={handleFetchHistory}>
+                  <Text style={styles.buttonText}>Consultar Histórico</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={() => setGameFetched(false)}>
+                  <Text style={styles.buttonText}>Voltar</Text>
+                </TouchableOpacity>
               </View>
-              {fieldPlayers.map((item, index) => (
-                <View style={styles.tableRow} key={`${item.Vaga}-${index}`}>
-                  <Text style={styles.tableCell}>{item.Vaga}</Text>
-                  <Text style={styles.tableCell}>{item.JogadoresLinha}</Text>
-                  <Text style={styles.tableCell}>
-                    {new Date(item['Data e Hora da Endrada']).toLocaleDateString('pt-BR')}{"\n"}
-                    {new Date(item['Data e Hora da Endrada']).toLocaleTimeString('pt-BR')}
-                  </Text>
-                  <Text style={styles.tableCell}>{item.Time}</Text>
-                </View>
-              ))}
 
-              <Text style={styles.subTitle}>Suplentes</Text>
+              <Text style={styles.subTitle}>Goleiros</Text>
               <View style={styles.table}>
                 <View style={styles.tableHeader}>
                   <Text style={styles.tableHeaderText}>Vaga</Text>
                   <Text style={styles.tableHeaderText}>Nome</Text>
                   <Text style={styles.tableHeaderText}>Data e Hora</Text>
-                  <Text style={styles.tableHeaderText}>Status</Text>
+                  <Text style={styles.tableHeaderText}>Time</Text>
                 </View>
-                {substitutes.map((item, index) => (
+                {goalkeepers.map((item, index) => (
                   <View style={styles.tableRow} key={`${item.Vaga}-${index}`}>
                     <Text style={styles.tableCell}>{item.Vaga}</Text>
-                    <Text style={styles.tableCell}>{item.Suplentes}</Text>
+                    <Text style={styles.tableCell}>{item.Goleiros}</Text>
                     <Text style={styles.tableCell}>
                       {new Date(item['Data e Hora da Endrada']).toLocaleDateString('pt-BR')}{"\n"}
                       {new Date(item['Data e Hora da Endrada']).toLocaleTimeString('pt-BR')}
                     </Text>
-                    <Text style={styles.tableCell}>Aguardando Vaga</Text>
+                    <Text style={styles.tableCell}>{item.Time}</Text>
                   </View>
                 ))}
               </View>
-            </View>
-          </>
-        )}
-      </ScrollView>
+
+              <Text style={styles.subTitle}>Jogadores de Linha</Text>
+              <View style={styles.table}>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.tableHeaderText}>Vaga</Text>
+                  <Text style={styles.tableHeaderText}>Nome</Text>
+                  <Text style={styles.tableHeaderText}>Data e Hora</Text>
+                  <Text style={styles.tableHeaderText}>Time</Text>
+                </View>
+                {fieldPlayers.map((item, index) => (
+                  <View style={styles.tableRow} key={`${item.Vaga}-${index}`}>
+                    <Text style={styles.tableCell}>{item.Vaga}</Text>
+                    <Text style={styles.tableCell}>{item.JogadoresLinha}</Text>
+                    <Text style={styles.tableCell}>
+                      {new Date(item['Data e Hora da Endrada']).toLocaleDateString('pt-BR')}{"\n"}
+                      {new Date(item['Data e Hora da Endrada']).toLocaleTimeString('pt-BR')}
+                    </Text>
+                    <Text style={styles.tableCell}>{item.Time}</Text>
+                  </View>
+                ))}
+
+                <Text style={styles.subTitle}>Suplentes</Text>
+                <View style={styles.table}>
+                  <View style={styles.tableHeader}>
+                    <Text style={styles.tableHeaderText}>Vaga</Text>
+                    <Text style={styles.tableHeaderText}>Nome</Text>
+                    <Text style={styles.tableHeaderText}>Data e Hora</Text>
+                    <Text style={styles.tableHeaderText}>Status</Text>
+                  </View>
+                  {substitutes.map((item, index) => (
+                    <View style={styles.tableRow} key={`${item.Vaga}-${index}`}>
+                      <Text style={styles.tableCell}>{item.Vaga}</Text>
+                      <Text style={styles.tableCell}>{item.Suplentes}</Text>
+                      <Text style={styles.tableCell}>
+                        {new Date(item['Data e Hora da Endrada']).toLocaleDateString('pt-BR')}{"\n"}
+                        {new Date(item['Data e Hora da Endrada']).toLocaleTimeString('pt-BR')}
+                      </Text>
+                      <Text style={styles.tableCell}>Aguardando Vaga</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+        </ScrollView>
+      </View>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-background: {
-    flex: 1, 
-    width: '100%', 
-    height: '100%', 
+  background: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
     resizeMode: 'cover',
-    opacite: 5
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 20,
+  },
+  header: {
+    padding: 20,
+    alignItems: 'flex-end',
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   container: {
-    flex: 1, 
-    justifyContent: 'center', 
+    flexGrow: 1,
     padding: 20,
   },
   title: {
