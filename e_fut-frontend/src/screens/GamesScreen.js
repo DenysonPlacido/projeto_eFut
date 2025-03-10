@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, ImageBackground, StyleSheet, Button, Platform, Dimensions } from 'react-native';
 import axios from 'axios';
-import { Picker } from '@react-native-picker/picker';
+import ModalSelector from 'react-native-modal-selector';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const GamesScreen = () => {
@@ -13,7 +13,7 @@ const GamesScreen = () => {
   const [substitutes, setSubstitutes] = useState([]);
   const [gameFetched, setGameFetched] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState({});
+  const [loggedInUser, setLoggedInUser] = useState('');
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -31,7 +31,7 @@ const GamesScreen = () => {
       const loggedInUserWhats = await AsyncStorage.getItem('loggedInUserWhats');
       axios.get(`http://192.168.1.117:3000/api/users/getUser`, { params: { phone: loggedInUserWhats } })
         .then(response => {
-          setLoggedInUser(response.data);
+          setLoggedInUser(response.data.loggedInUser);
         })
         .catch(error => {
           console.error(error);
@@ -52,37 +52,55 @@ const GamesScreen = () => {
     }
   };
 
-  const handleAddPlayer = () => {
-    axios.post(`http://192.168.1.117:3000/api/games/addPlayer`, { 
-      whats: userId, 
-      goleiroOuLinha: playerType, 
-      idJogo: gameId
-    })
-      .then(response => {
-        fetchGameList();
-        Alert.alert('Sucesso', 'Jogador adicionado com sucesso');
-      })
-      .catch(error => {
+  const handleAddPlayer = async () => {
+    try {
+      const response = await axios.post(`http://192.168.1.117:3000/api/games/addPlayer`, { 
+        whats: userId, 
+        goleiroOuLinha: playerType, 
+        idJogo: gameId
+      });
+      fetchGameList();
+      Alert.alert('Sucesso', 'Jogador adicionado com sucesso');
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        if (isAdmin) {
+          Alert.alert(
+            'Jogador não encontrado',
+            'Esse jogador não está cadastrado. Deseja cadastrá-lo?',
+            [
+              { text: 'Cancelar', style: 'cancel' },
+              { text: 'Cadastrar', onPress: () => navigation.navigate('Register') }
+            ]
+          );
+        } else {
+          Alert.alert('Erro', 'Seu usuário não é admin. Você só pode adicionar ou remover você mesmo da lista');
+        }
+      } else {
         console.error(error);
         Alert.alert('Erro', error.response?.data?.message || 'Falha ao adicionar jogador');
-      });
+      }
+    }
   };
 
   const handleRemovePlayer = async () => {
-    const loggedInUser = await getLoggedInUser();
-    axios.post(`http://192.168.1.117:3000/api/games/removePlayer`, { 
-      whats: userId, 
-      idJogo: gameId, 
-      usuarioLogado: loggedInUser
-    })
-    .then(() => {
+    const loggedInUserWhats = await AsyncStorage.getItem('loggedInUserWhats');
+    if (!isAdmin && userId !== loggedInUserWhats) {
+      Alert.alert('Erro', 'Você só pode remover seu nome da lista');
+      return;
+    }
+
+    try {
+      await axios.post(`http://192.168.1.117:3000/api/games/removePlayer`, { 
+        whats: userId, 
+        idJogo: gameId, 
+        usuarioLogado: loggedInUserWhats
+      });
       fetchGameList();
       Alert.alert('Sucesso', 'Jogador removido com sucesso');
-    })
-    .catch(error => {
+    } catch (error) {
       console.error(error);
       Alert.alert('Erro', error.response?.data?.message || 'Falha ao remover jogador');
-    });
+    }
   };
 
   const fetchGameList = () => {
@@ -95,10 +113,16 @@ const GamesScreen = () => {
         setGameFetched(true);
       })
       .catch(error => {
-        console.error(error);
-        Alert.alert('Erro', 'Falha ao buscar a lista de jogos');
+        console.error('Erro ao buscar lista de jogos:', error);
+        Alert.alert('Erro', error.response?.data?.message || 'Falha ao buscar lista de jogos');
       });
   };
+
+  useEffect(() => {
+    if (gameId) {
+      fetchGameList();
+    }
+  }, [gameId]);
 
   const handleFetchHistory = () => {
     axios.get(`http://192.168.1.117:3000/api/games/fetchGameHistory`, { params: { idJogo: gameId } })
@@ -111,28 +135,37 @@ const GamesScreen = () => {
       });
   };
 
-  const handleGenerateTeams = () => {
-    axios.post(`http://192.168.1.117:3000/api/games/generateTeams`, { 
-      goleiroEntra: 1, 
-      cores: 'Amarelo;Preto;Verde', 
-      idJogo: gameId 
-    })
-      .then(response => {
-        fetchGameList();
-        Alert.alert('Sucesso', 'Times gerados com sucesso');
-      })
-      .catch(error => {
-        console.error(error);
-        Alert.alert('Erro', 'Falha ao gerar times');
-      });
+  const handleGenerateTeams = async () => {
+    if (!isAdmin) {
+      Alert.alert('Erro', 'Ação destinada a jogadores admin');
+      return;
+    }
+  };
+
+  const handleMassDraw = async () => {
+    if (!isAdmin) {
+      Alert.alert('Erro', 'Ação destinada a jogadores admin');
+      return;
+    }
+  };
+
+  const handleDeleteTeams = async () => {
+    if (!isAdmin) {
+      Alert.alert('Erro', 'Ação destinada a jogadores admin');
+      return;
+    }
   };
 
   return (
-    <ImageBackground source={require('../../assets/images/fundo-esportivo.jpg')} style={styles.background}>
-      <View style={styles.overlay}>
+    <ImageBackground 
+      source={require('../../assets/images/fundo-esportivo.jpg')} 
+      style={styles.background}
+      imageStyle={{ opacity: 0.2, resizeMode: 'cover' }}
+    >
         <View style={styles.header}>
           <Text style={styles.headerText}>{loggedInUser.nickname || loggedInUser.name} ({loggedInUser.phone})</Text>
         </View>
+      <View style={styles.overlay}>
         <ScrollView contentContainerStyle={styles.container}>
           {!gameFetched ? (
             <>
@@ -157,14 +190,14 @@ const GamesScreen = () => {
                 onChangeText={setUserId} 
               />
               <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={playerType}
-                  style={styles.picker}
-                  onValueChange={(itemValue) => setPlayerType(itemValue)}
-                >
-                  <Picker.Item label="Linha" value="Linha" />
-                  <Picker.Item label="Goleiro" value="Goleiro" />
-                </Picker>
+                <ModalSelector
+                  data={[
+                    { key: 'Linha', label: 'Linha' },
+                    { key: 'Goleiro', label: 'Goleiro' }
+                  ]}
+                  initValue="Linha"
+                  onChange={(option) => setPlayerType(option.key)}
+                />
               </View>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.actionButton} onPress={handleAddPlayer}>
@@ -181,6 +214,12 @@ const GamesScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.actionButton} onPress={() => setGameFetched(false)}>
                   <Text style={styles.buttonText}>Voltar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={handleMassDraw}>
+                  <Text style={styles.buttonText}>Realizar Sorteio em Massa</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={handleDeleteTeams}>
+                  <Text style={styles.buttonText}>Deletar Times Gerados</Text>
                 </TouchableOpacity>
               </View>
 
@@ -254,17 +293,21 @@ const GamesScreen = () => {
   );
 };
 
+const { width, height } = Dimensions.get('window'); 
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
     width: '100%',
-    height: '100%',
+    height: height,
     resizeMode: 'cover',
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 20,
+    borderRadius: 10,
   },
   header: {
     padding: 20,

@@ -6,10 +6,9 @@ const HomeScreen = ({ navigation }) => {
     <ImageBackground 
       source={require('../../assets/images/fundo-esportivo.jpg')} 
       style={styles.background}
-      imageStyle={{ opacity: 0.2, resizeMode: 'cover' }} // Ajusta a imagem para cobrir a tela sem distorção
+      imageStyle={{ opacity: 0.2, resizeMode: 'cover' }}
     >
       <View style={styles.container}>
-        {/* Fundo semi-transparente para aumentar o contraste */}
         <View style={styles.overlay}>
           <Text style={styles.title}>🔥 Futi de QUINTA! 🔥</Text>
           <Text style={styles.description}>📍 Local: Quadra Coopertáxi (Rua... 🗺️)</Text>
@@ -39,7 +38,7 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
-const { width, height } = Dimensions.get('window'); // Para obter a largura e altura da tela
+const { width, height } = Dimensions.get('window'); 
 
 const styles = StyleSheet.create({
   container: {
@@ -49,7 +48,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo escuro semi-transparente para melhorar contraste
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
     padding: 20,
     borderRadius: 10,
   },
@@ -58,7 +57,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    color: '#fff', // Cor branca para se destacar no fundo
+    color: '#fff', 
   },
   description: {
     fontSize: 18,
@@ -96,8 +95,8 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    width: '100%',  // A imagem ocupa 100% da largura da tela
-    height: height, // A imagem ocupa 100% da altura da tela
+    width: '100%', 
+    height: height, 
     justifyContent: 'center',
   },
 });

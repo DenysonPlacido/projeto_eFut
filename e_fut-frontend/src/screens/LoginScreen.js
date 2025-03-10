@@ -4,14 +4,12 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-
 const LoginScreen = ({ navigation, setIsLoggedIn }) => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
-      // const response = await axios.post('http://localhost:3000/api/users/login', { phone, password });
       const response = await axios.post('http://192.168.1.117:3000/api/users/login', { phone, password });
 
       const { token } = response.data;
@@ -30,7 +28,12 @@ const LoginScreen = ({ navigation, setIsLoggedIn }) => {
   };
 
   const handleContactDeveloper = () => {
-    Linking.openURL('https://wa.me/5567993464728?text=Olá!%20Eu%20vi%20seu%20app%20e%20gostaria%20de%20saber%20mais.');
+    const developerURL = 'https://wa.me/5567993464728';
+    const message = 'Olá! Eu vi seu aplicativo e estou interessado em obter mais informações. Obrigado!';
+    const encodedMessage = encodeURIComponent(message);
+    const url = `${developerURL}?text=${encodedMessage}`;
+    
+    Linking.openURL(url);
   };
 
   return (
@@ -63,8 +66,8 @@ const LoginScreen = ({ navigation, setIsLoggedIn }) => {
             <Text style={styles.forgotPassword}>Esqueci minha senha</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.registerText}>Criar uma conta</Text>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.buttonText}>Criar uma conta</Text>
           </TouchableOpacity>
         </View>
 
@@ -91,21 +94,57 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Efeito escuro no overlay
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
   },
   container: {
     padding: 20,
   },
-  title: { fontSize: 28, marginBottom: 20, textAlign: 'center', color: '#fff' },
-  input: { height: 50, borderColor: '#ddd', borderWidth: 1, marginBottom: 15, paddingHorizontal: 10, borderRadius: 5, backgroundColor: '#fff' },
-  button: { backgroundColor: 'rgba(0, 0, 0, 0.7)', padding: 15, borderRadius: 5, alignItems: 'center', marginBottom: 10 },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  forgotPassword: { color: '#ddd', textAlign: 'center', marginTop: 10, textDecorationLine: 'underline' },
-  registerButton: { marginTop: 20, alignItems: 'center' },
-  registerText: { color: '#fff', fontSize: 16, fontWeight: 'bold', textDecorationLine: 'underline' },
-  footer: { position: 'absolute', bottom: 20, left: 20, right: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  footerText: { color: '#fff' },
+  title: { 
+    fontSize: 28, 
+    marginBottom: 20, 
+    textAlign: 'center', 
+    color: '#fff' 
+  },
+  input: { 
+    height: 50, 
+    borderColor: '#ddd', 
+    borderWidth: 1, 
+    marginBottom: 15, 
+    paddingHorizontal: 10, 
+    borderRadius: 5, 
+    backgroundColor: '#fff' 
+  },
+  button: { 
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', 
+    padding: 15, 
+    borderRadius: 5, 
+    alignItems: 'center', 
+    marginBottom: 10 
+  },
+  buttonText: { 
+    color: '#fff', 
+    fontSize: 18, 
+    fontWeight: 'bold' 
+  },
+  forgotPassword: { 
+    color: '#ddd', 
+    textAlign: 'center', 
+    marginTop: 10, 
+    textDecorationLine: 'underline' 
+  },
+  footer: { 
+    position: 'absolute', 
+    bottom: 20, 
+    left: 20, 
+    right: 20, 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center' 
+  },
+  footerText: { 
+    color: '#fff' 
+  },
 });
 
 export default LoginScreen;

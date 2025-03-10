@@ -16,10 +16,9 @@ const UserScreen = ({ navigation }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [searchPhone, setSearchPhone] = useState('');
   const [searchedUser, setSearchedUser] = useState(null);
-  const [usuarioLogado, setUsuarioLogado] = useState('userLoggedPhone'); // Substitua com o telefone do usuário logado
+  const [usuarioLogado, setUsuarioLogado] = useState('userLoggedPhone'); 
 
   useEffect(() => {
-    // Carregar dados do usuário
     axios.get(`http://192.168.117:3000/api/users/${usuarioLogado}`)
       .then((response) => {
         setUserData({
@@ -39,7 +38,6 @@ const UserScreen = ({ navigation }) => {
   }, []);
 
   const checkAdmin = () => {
-    // Função para verificar se o usuário é administrador
     axios.get(`http://192.168.117:3000/api/users/adminCheck/${usuarioLogado}`)
       .then(response => {
         setIsAdmin(response.data.isAdmin);
@@ -111,7 +109,7 @@ const UserScreen = ({ navigation }) => {
     <ImageBackground 
       source={require('../../assets/images/fundo-esportivo.jpg')} 
       style={styles.background}
-      imageStyle={{ opacity: 0.2, resizeMode: 'cover' }} // Ajusta a imagem para cobrir a tela sem distorção
+      imageStyle={{ opacity: 0.2, resizeMode: 'cover' }} 
     >
       <View style={styles.container}>
       <View style={styles.header}>
@@ -139,7 +137,7 @@ const UserScreen = ({ navigation }) => {
               style={styles.input}
               placeholder="Número de WhatsApp"
               value={userData.phone}
-              editable={false} // Bloqueado para usuários não administradores
+              editable={false} 
             />
             <TextInput
               style={styles.input}
@@ -212,7 +210,7 @@ const UserScreen = ({ navigation }) => {
   );
 };
 
-const { width, height } = Dimensions.get('window'); // Para obter a largura e altura da tela
+const { width, height } = Dimensions.get('window'); 
 
 
 const styles = StyleSheet.create({
@@ -220,20 +218,12 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo escuro semi-transparente para melhorar contraste
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
     padding: 20,
     borderRadius: 10,
   },
-  // container: {
-  //   flex: 1,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   width: '100%',
-  //   paddingTop: 50,
-  // },
   container: {
     flex: 1,
-    // justifyContent: 'center',
     width: width,
     padding: 20,
   },
@@ -272,8 +262,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   background: {
-    width: width,  // A imagem ocupa 100% da largura da tela
-    height: height, // A imagem ocupa 100% da altura da tela
+    width: width,  
+    height: height, 
     justifyContent: 'center',
   },
 });

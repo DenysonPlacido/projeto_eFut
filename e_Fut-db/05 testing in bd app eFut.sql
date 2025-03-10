@@ -30,15 +30,15 @@ INSERT INTO dbo.jogadores (STATUS_JOGADOR, FREQUENCIA, NOME, APELIDO, WHATS, SEN
 ('Ativo', 0, 'Flavio', 'Paraguai', 999010005, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
 ('Ativo', 0, 'Leonardo', 'Léo', 999010006, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
 ('Ativo', 0, 'Humberto', 'HL', 999010007, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
-('Ativo', 0, 'Odaide', '', 999010008, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
-('Ativo', 0, 'Robson', '', 999010009, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
-( 'Ativo', 0, 'Rodrigo', '', 999010010, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
-( 'Ativo', 0, 'Peterson', '', 999010011, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
+('Ativo', 0, 'Odaide', null, 999010008, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
+('Ativo', 0, 'Robson', null, 999010009, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
+( 'Ativo', 0, 'Rodrigo', null, 999010010, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
+( 'Ativo', 0, 'Peterson',null, 999010011, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
 ( 'Ativo', 0, 'Rodrigo', 'ISS', 999010012, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
 ( 'Ativo', 0, 'Mateus', 'Mita', 999010013, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
-( 'Ativo', 0, 'Vini', '', 999010014, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
-( 'Ativo', 0, 'Leandro', '', 999010015, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
-( 'Ativo', 0, 'Convidado', '', 0, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
+( 'Ativo', 0, 'Vini', null, 999010014, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
+( 'Ativo', 0, 'Leandro', null, 999010015, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
+( 'Ativo', 0, 'Convidado', null, 0, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
 ('Ativo', 0, 'Willyan', 'Wil', 999010017, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0),
 ('Ativo', 0, 'Cyrino', 'Cyr', 999010018, '$2a$10$3R664XXl41SfnR5CTX6qv.iXbh1QaC6V7jKqaBRvjUW/aJMfX1CV2',0)
 
@@ -92,12 +92,12 @@ EXEC dbo.ADICIONAR_REMOVER_JOGADOR @whats = 999010005, @goleiroOuLinha = 'LINHA'
 use eFUT
 
 -- Consulta a lista
-EXEC DBO.CONSULTA_LISTA_JOGO @IDJOGO = 2
+EXEC DBO.CONSULTA_LISTA_JOGO @IDJOGO = 1
 
 -- Consulta a lista após as remoções
-EXEC dbo.HISTORICO_JOGO_ATUAL @IDJOGO =2 --	ainda esta errado
+EXEC dbo.HISTORICO_JOGO_ATUAL @IDJOGO =1 --	ainda esta errado
 
-EXEC dbo.LIMPA_LISTA @IDJOGO = 2
+EXEC dbo.LIMPA_LISTA @IDJOGO = 1
 
 EXEC dbo.GERARTAMPINHAS @GOLEIROENTRA = 1, @CORES = 'Amarelo;Preto;Verde' , @IDJOGO =1
 
@@ -158,7 +158,7 @@ WHERE APELIDO = ''
 exec dbo.ADICIONAR_JOGADOR @whats= '999010004' ,@goleiroOuLinha = 'Linha', @idJogo=2
 
 use eFUT
-exec dbo.REMOVER_JOGADOR @whats = '67993464728', @idjogo = 2
+exec dbo.REMOVER_JOGADOR @whats = '67993464728', @idjogo = 1
 
 select * from LISTA_JOGOS
 

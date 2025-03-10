@@ -83,7 +83,7 @@
 --        END
 --        ELSE
 --        BEGIN
---            RAISERROR('Não há vagas disponíveis para o tipo de jogador selecionado.', 16, 1);
+--            RAISERROR('Nï¿½o hï¿½ vagas disponï¿½veis para o tipo de jogador selecionado.', 16, 1);
 --        END
 --    END
 --    ELSE  
@@ -140,21 +140,21 @@ BEGIN
     FROM dbo.jogadores
     WHERE whats = @whats;
 
-    -- Verificar se o jogador já está na lista
+    -- Verificar se o jogador jï¿½ estï¿½ na lista
     IF EXISTS (SELECT 1 FROM dbo.LISTA_JOGOS WHERE id_jogo = @idJogo AND id_jogador = @idJogador)
     BEGIN
-        RAISERROR('O jogador já está na lista.', 16, 1);
+        RAISERROR('O jogador jï¿½ estï¿½ na lista.', 16, 1);
         RETURN;
     END
 
-    -- Obter as vagas disponíveis no jogo
+    -- Obter as vagas disponï¿½veis no jogo
     SELECT @vagasGoleiros = vagas_gol, 
            @vagasLinhas = vagas_linhas, 
            @vagasSuplentes = vagas_suplentes
     FROM dbo.jogos
     WHERE id_jogo = @idJogo;
 
-    -- Contar o número de jogadores atuais
+    -- Contar o nï¿½mero de jogadores atuais
     SELECT @totalGoleiros = COUNT(*)
     FROM dbo.LISTA_JOGOS
     WHERE id_jogo = @idJogo AND TIPO_JOGADOR = 'Goleiro';
@@ -197,7 +197,7 @@ BEGIN
     END
     ELSE
     BEGIN
-        RAISERROR('Não há vagas disponíveis para o tipo de jogador selecionado.', 16, 1);
+        RAISERROR('Nï¿½o hï¿½ vagas disponï¿½veis para o tipo de jogador selecionado.', 16, 1);
     END
 END;
 GO
@@ -222,12 +222,12 @@ BEGIN
     FROM dbo.jogadores
     WHERE whats = @whats;
 
-    -- Obter o tipo de jogador removido e a posição
+    -- Obter o tipo de jogador removido e a posiï¿½ï¿½o
     SELECT @TIPO_JOGADOR_REMOVIDO = TIPO_JOGADOR, @posicaoRemovida = POSICAO_LISTA
     FROM dbo.LISTA_JOGOS
     WHERE id_jogo = @idJogo AND id_jogador = @idJogador;
 
-    -- Registrar a remoção
+    -- Registrar a remoï¿½ï¿½o
     INSERT INTO dbo.REGISTROS_JOGADORES (ID_JOGO, ID_JOGADOR, POSICAO_LISTA, TIPO_JOGADOR, ACAO)
     VALUES (@idJogo, @idJogador, @posicaoRemovida, @TIPO_JOGADOR_REMOVIDO, 'RETIRADO');
     
@@ -235,7 +235,7 @@ BEGIN
     DELETE FROM dbo.LISTA_JOGOS
     WHERE id_jogo = @idJogo AND id_jogador = @idJogador;
     
-    -- Atualizar posições na lista
+    -- Atualizar posiï¿½ï¿½es na lista
     UPDATE dbo.LISTA_JOGOS
     SET posicao_lista = posicao_lista - 1
     WHERE id_jogo = @idJogo AND posicao_lista > @posicaoRemovida;
@@ -296,7 +296,7 @@ BEGIN
 		J.ID_JOGADOR,
 		ISNULL(J.APELIDO,J.NOME) AS 'Suplentes',
 		LJ.DATA_HORA_REGISTRO AS 'Data e Hora da Endrada'
-		--ISNULL(T.COR,'Não Sorteado') AS 'Time'
+		--ISNULL(T.COR,'Nï¿½o Sorteado') AS 'Time'
 	FROM dbo.LISTA_JOGOS LJ
 		LEFT JOIN dbo.JOGADORES J
 			ON LJ.ID_JOGADOR = J.ID_JOGADOR
@@ -319,11 +319,11 @@ BEGIN
 	SET NOCOUNT ON;
 	
 	SELECT 
-		LJ.POSICAO_LISTA as 'Posição na Lista',
+		LJ.POSICAO_LISTA as 'Posiï¿½ï¿½o na Lista',
 		RJ.TIPO_JOGADOR AS 'Tipo',
 		ISNULL(J.APELIDO,J.NOME) AS 'Nome',
 		RJ.DATA_HORA_REGISTRO AS 'Data e Hora de Registro',
-		RJ.ACAO AS 'Ação'
+		RJ.ACAO AS 'Aï¿½ï¿½o'
 	FROM dbo.REGISTROS_JOGADORES RJ
 		LEFT JOIN dbo.JOGADORES J
 			ON RJ.ID_JOGADOR = J.ID_JOGADOR
@@ -358,28 +358,28 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Verificação de entrada
+    -- Verificaï¿½ï¿½o de entrada
     IF NOT EXISTS (SELECT 1 FROM dbo.JOGOS WHERE ID_JOGO = @IDJOGO)
     BEGIN
-        RAISERROR('Jogo não encontrado.', 16, 1);
+        RAISERROR('Jogo nï¿½o encontrado.', 16, 1);
         RETURN;
     END
 
-    -- Inicialização e uso de variáveis
+    -- Inicializaï¿½ï¿½o e uso de variï¿½veis
     DECLARE @NUMTAMPINHAS INT;
     SET @NUMTAMPINHAS = 
         (SELECT VALOR_REGRA 
          FROM dbo.REGRAS_APP 
          WHERE DESCRICAO = 'JOGADORES_POR_TIME') - IIF(@GOLEIROENTRA = 0, 1, 0);
 
-    -- Validação de cores
+    -- Validaï¿½ï¿½o de cores
     IF LEN(@CORES) = 0
     BEGIN
-        RAISERROR('Lista de cores inválida.', 16, 1);
+        RAISERROR('Lista de cores invï¿½lida.', 16, 1);
         RETURN;
     END
 
-    -- Inserção com controle de erros
+    -- Inserï¿½ï¿½o com controle de erros
     BEGIN TRY
         DECLARE @COR NVARCHAR(20);
         DECLARE @COLORS TABLE (COR NVARCHAR(20));
@@ -409,7 +409,7 @@ BEGIN
         DECLARE @ErrorMessage NVARCHAR(4000);
         SET @ErrorMessage = ERROR_MESSAGE();
 
-        -- Lançamento do erro com a mensagem capturada
+        -- Lanï¿½amento do erro com a mensagem capturada
         RAISERROR('Erro ao gerar tampinhas: %s', 16, 1, @ErrorMessage);
     END CATCH
 END;
@@ -426,22 +426,22 @@ BEGIN
 	
 	SET NOCOUNT ON;
 
-    -- Verifica se o jogador já realizou o sorteio neste jogo
+    -- Verifica se o jogador jï¿½ realizou o sorteio neste jogo
     IF EXISTS (
         SELECT 1
         FROM dbo.TAMPINHAS
         WHERE ID_JOGO = @IDJOGO AND ID_JOGADOR = @IDJOGADOR
     )
     BEGIN
-        -- O jogador já realizou o sorteio; encerra a procedure
-        PRINT 'O jogador já realizou um sorteio para este jogo.';
+        -- O jogador jï¿½ realizou o sorteio; encerra a procedure
+        PRINT 'O jogador jï¿½ realizou um sorteio para este jogo.';
         RETURN;
     END
 
-    -- Declara a variável para armazenar a tampinha sorteada
+    -- Declara a variï¿½vel para armazenar a tampinha sorteada
     DECLARE @TAMPINHAID INT;
 
-    -- Seleciona uma tampinha disponível aleatoriamente
+    -- Seleciona uma tampinha disponï¿½vel aleatoriamente
     SELECT TOP 1 @TAMPINHAID = ID_TAMPINHA 
     FROM DBO.TAMPINHAS 
     WHERE ID_JOGO = @IDJOGO AND ID_JOGADOR IS NULL
@@ -458,7 +458,7 @@ BEGIN
     END
     ELSE
     BEGIN
-        PRINT 'Não há tampinhas disponíveis para sorteio neste jogo.';
+        PRINT 'Nï¿½o hï¿½ tampinhas disponï¿½veis para sorteio neste jogo.';
     END
 END;
 GO
@@ -517,7 +517,7 @@ BEGIN
         SET @SQL += N' SET ' + @CAMPO_ALTERADO + N' = @VALOR_ALTERADO WHERE ID_LOCAL = @ID_LOCAL;';
     END
 
-    -- Executa a consulta dinâmica com parâmetros
+    -- Executa a consulta dinï¿½mica com parï¿½metros
     EXEC sp_executesql @SQL,
         N'@VALOR_ALTERADO VARCHAR(100), @ID_LOCAL INT',
         @VALOR_ALTERADO = @VALOR_ALTERADO,
@@ -550,7 +550,7 @@ BEGIN
 	BEGIN CATCH
 		
 		PRINT 'Ocorreu um erro!';
-		PRINT 'Código do erro: ' + CAST(ERROR_NUMBER() AS VARCHAR);
+		PRINT 'Cï¿½digo do erro: ' + CAST(ERROR_NUMBER() AS VARCHAR);
 		PRINT 'Mensagem: ' + ERROR_MESSAGE();
 
 		INSERT INTO Log_Erros (NumeroErro, MensagemErro, LinhaErro, NomeProcedure)
@@ -579,7 +579,7 @@ BEGIN
 	BEGIN CATCH
 		
 		PRINT 'Ocorreu um erro!';
-		PRINT 'Código do erro: ' + CAST(ERROR_NUMBER() AS VARCHAR);
+		PRINT 'Cï¿½digo do erro: ' + CAST(ERROR_NUMBER() AS VARCHAR);
 		PRINT 'Mensagem: ' + ERROR_MESSAGE();
 
 		INSERT INTO Log_Erros (NumeroErro, MensagemErro, LinhaErro, NomeProcedure)

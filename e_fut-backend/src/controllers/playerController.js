@@ -1,5 +1,3 @@
-// src/controllers/playerController.js
-
 const sql = require('../config/dbConfig');
 
 const getPlayers = (req, res) => {

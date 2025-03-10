@@ -1,4 +1,3 @@
-// src/screens/FinanceScreen.js
 
 import React from 'react';
 import { View, Text, Button, StyleSheet, ImageBackground, Dimensions } from 'react-native';
@@ -15,7 +14,7 @@ const FinanceScreen = () => {
     </ImageBackground>
   );
 };
-const { width, height } = Dimensions.get('window'); // Para obter a largura e altura da tela
+const { width, height } = Dimensions.get('window'); 
 
 const styles = StyleSheet.create({
   container: {
@@ -25,7 +24,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo escuro semi-transparente para melhorar contraste
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
     padding: 20,
     borderRadius: 10,
   },
@@ -34,11 +33,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    color: '#fff', // Cor branca para se destacar no fundo
+    color: '#fff', 
   },
   background: {
-    width: '100%',  // A imagem ocupa 100% da largura da tela
-    height: height, // A imagem ocupa 100% da altura da tela
+    width: '100%', 
+    height: height, 
     justifyContent: 'center',
   },
 });

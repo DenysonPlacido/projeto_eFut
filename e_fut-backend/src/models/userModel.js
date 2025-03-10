@@ -1,5 +1,3 @@
-// src/models/userModel.js
-
 const sql = require('../config/dbConfig');
 const bcrypt = require('bcryptjs');
 
@@ -16,8 +14,6 @@ const createUser = async (userData) => {
 const authenticateUser = async (userData) => {
   const { phone, password } = userData;
 
-
-
   const request = new sql.Request();
   const result = await request.query(`EXEC dbo.READ_USER @WHATS=${phone}`);
 
@@ -32,7 +28,7 @@ const authenticateUser = async (userData) => {
   return null;
 };
 
-// Função para atualizar os dados do usuário
+
 const updateUser = async (name, nickname, phone, password, whats) => {
   const request = new sql.Request();
   
