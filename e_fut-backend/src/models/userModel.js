@@ -6,9 +6,13 @@ const createUser = async (userData) => {
   const hashedPassword = await bcrypt.hash(password, 11); 
 
   const request = new sql.Request();
-  return request.query(`
-    exec dbo.create_user @NOME=${name}, @APELIDO=${nickname}, @WHATS=${phone}, @SENHA='${hashedPassword}'
-  `);
+  console.log(`Executando CREATE_USER com parâmetros: NOME='${name}', APELIDO='${nickname}', WHATS='${phone}', SENHA=${hashedPassword}, user_adm=1`);
+  return request.input('NOME', sql.VarChar(50), name)
+    .input('APELIDO', sql.VarChar(50), nickname)
+    .input('WHATS', sql.VarChar(11), phone)
+    .input('SENHA', sql.NVarChar(255), hashedPassword)
+    .input('user_adm', sql.Bit, 1) 
+    .execute('dbo.CREATE_USER');
 };
 
 const authenticateUser = async (userData) => {
@@ -28,7 +32,6 @@ const authenticateUser = async (userData) => {
   return null;
 };
 
-
 const updateUser = async (name, nickname, phone, password, whats) => {
   const request = new sql.Request();
   
@@ -36,7 +39,6 @@ const updateUser = async (name, nickname, phone, password, whats) => {
     exec dbo.update_user @NOME='${name}', @APELIDO='${nickname}', @WHATS='${phone}', @SENHA='${password}', @WHATS_USER='${whats}'
   `);
 };
-
 
 module.exports = {
   createUser,
