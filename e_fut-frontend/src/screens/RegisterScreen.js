@@ -16,7 +16,6 @@ const RegisterScreen = ({ navigation }) => {
     } catch (error) {
       console.error(error);
       Alert.alert('Erro', 'Falha ao registrar usuário');
-      alert('Erro. Falha ao registrar usuário');
     }
   };
 

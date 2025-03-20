@@ -5,22 +5,11 @@ require('dotenv').config();
 
 const register = async (req, res) => {
   const { phone, password, name, nickname } = req.body;
-  const request = new sql.Request();
 
   try {
     console.log(`Registrando usuário com telefone: ${phone}, nome: ${name}, apelido: ${nickname}`);
-    request.input('NOME', sql.VarChar(50), name)
-      .input('APELIDO', sql.VarChar(50), nickname)
-      .input('WHATS', sql.Int, phone)
-      .input('SENHA', sql.NVarChar(255), password)
-      .execute('dbo.CREATE_USER', (err, result) => {
-        if (err) {
-          console.error('Erro ao registrar usuário:', err);
-          res.status(500).send(err);
-        } else {
-          res.status(200).send({ message: 'Usuário registrado com sucesso' });
-        }
-      });
+    await createUser({ phone, password, name, nickname });
+    res.status(200).send({ message: 'Usuário registrado com sucesso' });
   } catch (error) {
     console.error('Erro ao registrar usuário:', error);
     res.status(500).send(error);
@@ -86,8 +75,8 @@ const getUserByPhone = async (req, res) => {
 
   try {
     const result = await request.query(`SELECT isnull(APELIDO,NOME) as nome FROM dbo.JOGADORES WHERE WHATS = '${phone}'`);
-      const loggedInUser = result.recordset[0]?.nome;
-      res.status(200).send({ loggedInUser });
+    const loggedInUser = result.recordset[0]?.nome;
+    res.status(200).send({ loggedInUser });
   } catch (error) {
     console.error(error);
     res.status(500).send({ message: 'Erro ao buscar usuário' });
@@ -100,7 +89,6 @@ const checkAdmin = async (req, res) => {
 
   try {
     const result = await request.query(`SELECT user_adm FROM jogadores WHERE WHATS = '${phone}'`);
-
     const isAdmin = result.recordset[0]?.user_adm === 1;
     res.status(200).send({ isAdmin });
   } catch (error) {
@@ -115,7 +103,6 @@ const fetchLoggedInUser = async (req, res) => {
 
   try {
     const result = await request.query(`SELECT user_adm FROM jogadores WHERE WHATS = '${phone}'`);
-
     const isAdmin = result.recordset[0]?.user_adm === 1;
     res.status(200).send({ isAdmin });
   } catch (error) {

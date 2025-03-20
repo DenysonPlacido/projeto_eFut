@@ -164,3 +164,15 @@ select * from LISTA_JOGOS
 
 
 select * from JOGADORES
+
+
+exec dbo.create_user @NOME='Jessica', @APELIDO='Jes', @WHATS='67998757417', @SENHA='$2a$11$IeZYnnRLZuaXEONVKyh6SuFl4k3iiZQ9tCOtWfIlW53kLPTK8I4PC',@user_adm=1
+
+
+exec sp_executesql @statement=N'
+    exec dbo.create_user @NOME=Fulano, @APELIDO=FUFU, @WHATS=6799999000=, @SENHA=''$2a$11$cmEN3MSZR/902XX7wwQzA.4MdgsvczWt0m50cQkSgHKBgbwyfOpae''
+  '
+
+exec sp_executesql @statement=N'
+    exec dbo.create_user @NOME=Fulano, @APELIDO=FUFU, @WHATS=679999900, @SENHA=''$2a$11$TUI6Vx4ffDMjQG8kAH.F2O.NxvC7N6keQukhqPsOmkfCnWlpseZ.6''
+  '
