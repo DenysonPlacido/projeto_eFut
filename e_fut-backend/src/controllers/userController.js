@@ -1,8 +1,10 @@
 const { createUser, authenticateUser, updateUser } = require('../models/userModel');
 const jwt = require('jsonwebtoken');
-const sql = require('../config/dbConfig');
+const bcrypt = require('bcrypt');
+const supabase = require('../config/dbConfig');
 require('dotenv').config();
 
+// Registro de usuário
 const register = async (req, res) => {
   const { phone, password, name, nickname } = req.body;
 
@@ -16,32 +18,33 @@ const register = async (req, res) => {
   }
 };
 
+// Login e geração de token
 const login = async (req, res) => {
   try {
     const user = await authenticateUser(req.body);
     if (!user) {
       return res.status(401).send('Authentication failed');
     }
-    const token = jwt.sign({ id: user.ID_JOGADOR }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id_jogador }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
 
+// Atualização de dados pelo próprio usuário
 const updateUserData = async (req, res) => {
   const { name, nickname, phone, password, newPassword, confirmPassword } = req.body;
-  const { whats } = req.params; 
+  const { whats } = req.params;
 
   try {
     if (newPassword !== confirmPassword) {
       return res.status(400).send('As senhas não coincidem!');
     }
 
-    let hashedPassword = password ? await bcrypt.hash(newPassword, 11) : password;
-
+    const hashedPassword = await bcrypt.hash(newPassword, 11);
     await updateUser(name, nickname, phone, hashedPassword, whats);
-    
+
     res.status(200).send({ message: 'Dados atualizados com sucesso!' });
   } catch (error) {
     console.error(error);
@@ -49,19 +52,19 @@ const updateUserData = async (req, res) => {
   }
 };
 
+// Atualização de dados por um administrador
 const updateUserByAdmin = async (req, res) => {
   const { name, nickname, phone, password, newPassword, confirmPassword } = req.body;
-  const { whats } = req.params; 
+  const { whats } = req.params;
 
   try {
     if (newPassword !== confirmPassword) {
       return res.status(400).send('As senhas não coincidem!');
     }
 
-    let hashedPassword = password ? await bcrypt.hash(newPassword, 11) : password;
-
+    const hashedPassword = await bcrypt.hash(newPassword, 11);
     await updateUser(name, nickname, phone, hashedPassword, whats);
-    
+
     res.status(200).send({ message: 'Dados atualizados com sucesso!' });
   } catch (error) {
     console.error(error);
@@ -69,13 +72,20 @@ const updateUserByAdmin = async (req, res) => {
   }
 };
 
+// Buscar nome do usuário pelo telefone
 const getUserByPhone = async (req, res) => {
-  const { phone } = req.query; 
-  const request = new sql.Request();
+  const { phone } = req.query;
 
   try {
-    const result = await request.query(`SELECT isnull(APELIDO,NOME) as nome FROM dbo.JOGADORES WHERE WHATS = '${phone}'`);
-    const loggedInUser = result.recordset[0]?.nome;
+    const { data, error } = await supabase
+      .from('jogadores')
+      .select('apelido, nome')
+      .eq('whats', phone)
+      .single();
+
+    if (error) throw error;
+
+    const loggedInUser = data?.apelido || data?.nome;
     res.status(200).send({ loggedInUser });
   } catch (error) {
     console.error(error);
@@ -83,27 +93,20 @@ const getUserByPhone = async (req, res) => {
   }
 };
 
+// Verificar se o usuário é administrador
 const checkAdmin = async (req, res) => {
   const { phone } = req.query;
-  const request = new sql.Request();
 
   try {
-    const result = await request.query(`SELECT user_adm FROM jogadores WHERE WHATS = '${phone}'`);
-    const isAdmin = result.recordset[0]?.user_adm === 1;
-    res.status(200).send({ isAdmin });
-  } catch (error) {
-    console.error('Erro ao verificar administrador:', error);
-    res.status(500).send(error);
-  }
-};
+    const { data, error } = await supabase
+      .from('jogadores')
+      .select('user_adm')
+      .eq('whats', phone)
+      .single();
 
-const fetchLoggedInUser = async (req, res) => {
-  const { phone } = req.query;
-  const request = new sql.Request();
+    if (error) throw error;
 
-  try {
-    const result = await request.query(`SELECT user_adm FROM jogadores WHERE WHATS = '${phone}'`);
-    const isAdmin = result.recordset[0]?.user_adm === 1;
+    const isAdmin = data?.user_adm === true;
     res.status(200).send({ isAdmin });
   } catch (error) {
     console.error('Erro ao verificar administrador:', error);
@@ -113,11 +116,9 @@ const fetchLoggedInUser = async (req, res) => {
 
 module.exports = {
   register,
-  checkAdmin,
+  login,
   updateUserData,
   updateUserByAdmin,
   getUserByPhone,
-  login,
-  fetchLoggedInUser
+  checkAdmin
 };
-

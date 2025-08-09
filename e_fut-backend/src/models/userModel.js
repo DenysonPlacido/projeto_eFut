@@ -1,47 +1,56 @@
-const sql = require('../config/dbConfig');
-const bcrypt = require('bcryptjs');
+// e_fut-backend/src/models/userModel.js
 
-const createUser = async (userData) => {
-  const { name, nickname, phone, password } = userData;
-  const hashedPassword = await bcrypt.hash(password, 11); 
+const supabase = require('../config/dbConfig');
+const bcrypt = require('bcrypt');
 
-  const request = new sql.Request();
-  console.log(`Executando CREATE_USER com parâmetros: NOME='${name}', APELIDO='${nickname}', WHATS='${phone}', SENHA=${hashedPassword}, user_adm=1`);
-  return request.input('NOME', sql.VarChar(50), name)
-    .input('APELIDO', sql.VarChar(50), nickname)
-    .input('WHATS', sql.VarChar(11), phone)
-    .input('SENHA', sql.NVarChar(255), hashedPassword)
-    .input('user_adm', sql.Bit, 1) 
-    .execute('dbo.CREATE_USER');
+// Criar novo usuário
+const createUser = async ({ name, nickname, phone, password }) => {
+  const hashedPassword = await bcrypt.hash(password, 11);
+
+  const { error } = await supabase
+    .from('jogadores')
+    .insert([{
+      nome: name,
+      apelido: nickname,
+      whats: phone,
+      senha: hashedPassword,
+      user_adm: true // ou false, dependendo da lógica
+    }]);
+
+  if (error) throw error;
 };
 
-const authenticateUser = async (userData) => {
-  const { phone, password } = userData;
+// Autenticar usuário
+const authenticateUser = async ({ phone, password }) => {
+  const { data, error } = await supabase
+    .from('jogadores')
+    .select('id_jogador, senha')
+    .eq('whats', phone)
+    .single();
 
-  const request = new sql.Request();
-  const result = await request.query(`EXEC dbo.READ_USER @WHATS=${phone}`);
+  if (error || !data) return null;
 
-  console.log('Database result:', result.recordset);
-
-  if (result.recordset.length > 0) {
-    const user = result.recordset[0];
-    const isMatch = await bcrypt.compare(password, user.SENHA);
-
-    if (isMatch) return user;
-  }
-  return null;
+  const isMatch = await bcrypt.compare(password, data.senha);
+  return isMatch ? data : null;
 };
 
-const updateUser = async (name, nickname, phone, password, whats) => {
-  const request = new sql.Request();
-  
-  return request.query(`
-    exec dbo.update_user @NOME='${name}', @APELIDO='${nickname}', @WHATS='${phone}', @SENHA='${password}', @WHATS_USER='${whats}'
-  `);
+// Atualizar dados do usuário
+const updateUser = async (name, nickname, phone, hashedPassword, whats) => {
+  const { error } = await supabase
+    .from('jogadores')
+    .update({
+      nome: name,
+      apelido: nickname,
+      whats: phone,
+      senha: hashedPassword
+    })
+    .eq('whats', whats);
+
+  if (error) throw error;
 };
 
 module.exports = {
   createUser,
-  updateUser,
-  authenticateUser
+  authenticateUser,
+  updateUser
 };
