@@ -1,3 +1,5 @@
+///workspaces/projeto_eFut/e_fut-backend/src/controllers/userController.js
+
 const { createUser, authenticateUser, updateUser } = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -114,11 +116,38 @@ const checkAdmin = async (req, res) => {
   }
 };
 
+
+// Buscar dados do usuário logado (exemplo básico)
+const fetchLoggedInUser = async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).send({ message: 'Token não fornecido' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { data, error } = await supabase
+      .from('jogadores')
+      .select('id_jogador, nome, apelido, whats')
+      .eq('id_jogador', decoded.id)
+      .single();
+
+    if (error) throw error;
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Erro ao buscar usuário logado:', error);
+    res.status(401).send({ message: 'Token inválido ou expirado' });
+  }
+};
+
 module.exports = {
   register,
   login,
   updateUserData,
   updateUserByAdmin,
   getUserByPhone,
-  checkAdmin
+  checkAdmin,
+  fetchLoggedInUser
 };

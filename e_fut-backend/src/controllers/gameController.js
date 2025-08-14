@@ -1,23 +1,7 @@
 //e_fut-backend/src/controllers/gameController.js
 
-// const sql = require('../config/dbConfig');
-const supabase = require('../config/dbConfig');
 
-// const addPlayer = (req, res) => {
-//   const { whats, goleiroOuLinha, idJogo } = req.body;
-//   const request = new sql.Request();
-//   request.input('whats', sql.NVarChar(20), whats)
-//     .input('goleiroOuLinha', sql.NVarChar(10), goleiroOuLinha)
-//     .input('idJogo', sql.Int, idJogo)
-//     .execute('dbo.ADICIONAR_JOGADOR', (err, result) => {
-//       if (err) {
-//         console.error('Erro ao adicionar jogador:', err);
-//         res.status(500).send(err);
-//       } else {
-//         res.status(200).send({ message: 'Jogador adicionado com sucesso' });
-//       }
-//     });
-// };
+const supabase = require('../config/dbConfig');
 
 
 const addPlayer = async (req, res) => {
